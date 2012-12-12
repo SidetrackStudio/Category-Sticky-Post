@@ -3,7 +3,7 @@
 Plugin Name: Category Sticky Post
 Plugin URI: http://tommcfarlin.com/category-sticky-post/
 Description: Mark a post to be placed at the top of a specified category archive. It's sticky posts specifically for categories.
-Version: 1.0
+Version: 1.1
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
@@ -36,24 +36,43 @@ class Category_Sticky_Post {
 	 */
 	function __construct() {
 
+		// Setup the activation hook specifically for checking for the custom.css file
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+
 		// Category Meta Box actions
-		add_action( 'add_meta_boxes', array( &$this, 'add_category_sticky_post_meta_box' ) );
-		add_action( 'save_post', array( &$this, 'save_category_sticky_post_data' ) );
-		add_action( 'wp_ajax_is_category_sticky_post', array( &$this, 'is_category_sticky_post' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_category_sticky_post_meta_box' ) );
+		add_action( 'save_post', array( $this, 'save_category_sticky_post_data' ) );
+		add_action( 'wp_ajax_is_category_sticky_post', array( $this, 'is_category_sticky_post' ) );
 				
 		// Filters for displaying the sticky category posts
-		add_filter( 'post_class', array( &$this, 'set_category_sticky_class' ) );
-		add_filter( 'the_posts', array( &$this, 'reorder_category_posts' ) );
+		add_filter( 'post_class', array( $this, 'set_category_sticky_class' ) );
+		add_filter( 'the_posts', array( $this, 'reorder_category_posts' ) );
 		
 		// Stylesheets
-		add_action( 'admin_enqueue_scripts', array( &$this, 'add_admin_styles_and_scripts' ) );
-		add_action( 'wp_enqueue_scripts', array( &$this, 'add_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_styles_and_scripts' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'add_styles' ) );
 
 	} // end constructor
 	
 	/*---------------------------------------------*
 	 * Action Functions
 	 *---------------------------------------------*/
+
+	 /**
+	  * Checks to see if a custom.css file exists. If not, creates it; otherwise, does nothing. This will
+	  * prevent customizations from being overwritten in future upgrades.
+	  */
+	 function activate() {
+		 
+		 // The path where the custom.css should be stored.
+		 $str_custom_path =  dirname( __FILE__ ) . '/css/custom.css';
+		 
+		 // If the custom.css file doesn't exist, then we create it
+		 if( ! file_exists( $str_custom_path ) ) {
+			 file_put_contents( $str_custom_path, '' );
+		 } // end if
+		 
+	 } // end activate
 
 	/**
 	 * Renders the meta box for allowing the user to select a category in which to stick a given post.
@@ -63,7 +82,7 @@ class Category_Sticky_Post {
 		add_meta_box(
 			'post_is_sticky',
 			__( 'Category Sticky', 'category-sticky-post' ),
-			array( &$this, 'category_sticky_post_display' ),
+			array( $this, 'category_sticky_post_display' ),
 			'post',
 			'side',
 			'low'
@@ -179,8 +198,8 @@ class Category_Sticky_Post {
 		// Only render the stylesheet if we're on an archive page
 		if( is_archive() ) {
 
-			wp_register_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/plugin.css' ) );
-			wp_enqueue_style( 'category-sticky-post' );
+			wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/plugin.css' ) );
+			wp_enqueue_style( 'category-sticky-post-custom', plugins_url( '/category-sticky-post/css/custom.css' ) );
 			
 		} // end if
 		
