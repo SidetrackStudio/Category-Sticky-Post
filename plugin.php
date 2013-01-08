@@ -3,7 +3,7 @@
 Plugin Name: Category Sticky Post
 Plugin URI: http://tommcfarlin.com/category-sticky-post/
 Description: Mark a post to be placed at the top of a specified category archive. It's sticky posts specifically for categories.
-Version: 1.1.1
+Version: 1.1.2
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
@@ -40,9 +40,11 @@ class Category_Sticky_Post {
 		 * I'm calling the same function using the activation hook - which is when the user activates the plugin,
 		 * and during upgrade plugin event. This ensures that the custom.css file can also be managed
 		 * when the plugin is updated.
+		 *
+		 * TODO: Restore this plugin when I've resolved the transient functionality properly.
 		 */
-		register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		add_action( 'pre_set_site_transient_update_plugins', array( $this, 'activate' ) );
+		//register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		//add_action( 'pre_set_site_transient_update_plugins', array( $this, 'activate' ) );
 
 		// Category Meta Box actions
 		add_action( 'add_meta_boxes', array( $this, 'add_category_sticky_post_meta_box' ) );

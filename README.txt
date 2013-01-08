@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/category-sticky-post/
 Tags: categories, post
 Requires at least: 3.4.1
 Tested up to: 3.5
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are category sticky posts
 
 == Changelog ==
+
+= 1.1.2 =
+* Removing the custom.css support as it was causing issues with other plugin upgrades. Will be restored later, if requested.
 
 = 1.1.1 =
 * Improving support for adding custom.css so that the file is also managed properly during the plugin update process
