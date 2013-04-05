@@ -3,13 +3,13 @@
 Plugin Name: Category Sticky Post
 Plugin URI: http://tommcfarlin.com/category-sticky-post/
 Description: Mark a post to be placed at the top of a specified category archive. It's sticky posts specifically for categories.
-Version: 1.1.2
+Version: 1.2
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
 License:
 
-  Copyright 2012 Tom McFarlin (tom@tommcfarlin.com)
+  Copyright 2012 - 2013 Tom McFarlin (tom@tommcfarlin.com)
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License, version 2, as 
@@ -28,23 +28,43 @@ License:
 class Category_Sticky_Post {
 
 	/*--------------------------------------------*
+	 * Attributes
+	 *--------------------------------------------*/
+
+	 /** A static reference to track the single instance of this class. */
+	 private static $instance = null;
+
+	 /** A boolean used to track whether or not the sticky post has been marked */
+	 private $is_sticky_post;
+
+	/*--------------------------------------------*
+	 * Singleton Implementation
+	 *--------------------------------------------*/
+	
+	/**
+	 * Method used to provide a single instance of this 
+	 */
+	public function getInstance() {
+		
+		if( null == self::$instance ) {
+			self::$instance = new Category_Sticky_Post();
+		} // end if
+		
+		return self::$instance;
+		
+	} // end getInstance
+	
+	/*--------------------------------------------*
 	 * Constructor
 	 *--------------------------------------------*/
 	
 	/**
 	 * Initializes the plugin by setting localization, admin styles, and content filters.
 	 */
-	function __construct() {
+	private function __construct() {
 
-		/* Setup the activation hook specifically for checking for the custom.css file
-		 * I'm calling the same function using the activation hook - which is when the user activates the plugin,
-		 * and during upgrade plugin event. This ensures that the custom.css file can also be managed
-		 * when the plugin is updated.
-		 *
-		 * TODO: Restore this plugin when I've resolved the transient functionality properly.
-		 */
-		//register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		//add_action( 'pre_set_site_transient_update_plugins', array( $this, 'activate' ) );
+		// Initialize the count of the sticky post
+		$this->is_sticky_post = false;
 
 		// Category Meta Box actions
 		add_action( 'add_meta_boxes', array( $this, 'add_category_sticky_post_meta_box' ) );
@@ -52,8 +72,8 @@ class Category_Sticky_Post {
 		add_action( 'wp_ajax_is_category_sticky_post', array( $this, 'is_category_sticky_post' ) );
 				
 		// Filters for displaying the sticky category posts
-		add_filter( 'post_class', array( $this, 'set_category_sticky_class' ) );
 		add_filter( 'the_posts', array( $this, 'reorder_category_posts' ) );
+		add_filter( 'post_class', array( $this, 'set_category_sticky_class' ) );
 		
 		// Stylesheets
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_styles_and_scripts' ) );
@@ -65,26 +85,10 @@ class Category_Sticky_Post {
 	 * Action Functions
 	 *---------------------------------------------*/
 
-	 /**
-	  * Checks to see if a custom.css file exists. If not, creates it; otherwise, does nothing. This will
-	  * prevent customizations from being overwritten in future upgrades.
-	  */
-	 function activate() {
-		 
-		 // The path where the custom.css should be stored.
-		 $str_custom_path =  dirname( __FILE__ ) . '/css/custom.css';
-		 
-		 // If the custom.css file doesn't exist, then we create it
-		 if( is_writable( $str_custom_path) && ! file_exists( $str_custom_path ) ) {
-			 file_put_contents( $str_custom_path, '' );
-		 } // end if
-		 
-	 } // end activate
-
 	/**
 	 * Renders the meta box for allowing the user to select a category in which to stick a given post.
 	 */
-	function add_category_sticky_post_meta_box() {
+	public function add_category_sticky_post_meta_box() {
 		
 		add_meta_box(
 			'post_is_sticky',
@@ -101,9 +105,9 @@ class Category_Sticky_Post {
 	 * Renders the select box that allows users to choose the category into which to stick the 
 	 * specified post.
 	 *
-	 * @param	$post	The post to be marked as sticky for the specified category.
+	 * @param	object	$post	The post to be marked as sticky for the specified category.
 	 */
-	function category_sticky_post_display( $post ) {
+	public function category_sticky_post_display( $post ) {
 		
 		// Set the nonce for security
 		wp_nonce_field( plugin_basename( __FILE__ ), 'category_sticky_post_nonce' );
@@ -128,35 +132,18 @@ class Category_Sticky_Post {
 	/**
 	 * Set the custom post meta for marking a post as sticky.
 	 *
-	 * @param	$post_id	The ID of the post to which we're saving the post meta
+	 * @param	int	$post_id	The ID of the post to which we're saving the post meta
 	 */
-	function save_category_sticky_post_data( $post_id ) {
+	public function save_category_sticky_post_data( $post_id ) {
 	
-		if( isset( $_POST['category_sticky_post_nonce'] ) && isset( $_POST['post_type'] ) ) {
-		
-			// Don't save if the user hasn't submitted the changes
-			if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-				return;
-			} // end if
-			
-			// Verify that the input is coming from the proper form
-			if( ! wp_verify_nonce( $_POST['category_sticky_post_nonce'], plugin_basename( __FILE__ ) ) ) {
-				return;
-			} // end if
-			
-			// Make sure the user has permissions to post
-			if( 'post' == $_POST['post_type']) {
-				if( ! current_user_can( 'edit_post', $post_id ) ) {
-					return;
-				} // end if
-			} // end if/else
+		if( isset( $_POST['category_sticky_post_nonce'] ) && isset( $_POST['post_type'] ) && $this->user_can_save( $post_id, 'category_sticky_post_nonce' ) ) {
 		
 			// Read the ID of the category to which we're going to stick this post
 			$category_id = '';
 			if( isset( $_POST['category_sticky_post'] ) ) {
 				$category_id = esc_attr( $_POST['category_sticky_post'] );
 			} // end if
-
+	
 			// If the value exists, delete it first. I don't want to write extra rows into the table.
 			if ( 0 == count( get_post_meta( $post_id, 'category_sticky_post' ) ) ) {
 				delete_post_meta( $post_id, 'category_sticky_post' );
@@ -164,7 +151,7 @@ class Category_Sticky_Post {
 	
 			// Update it for this post.
 			update_post_meta( $post_id, 'category_sticky_post', $category_id );
-	
+				
 		} // end if
 	
 	} // end save_category_sticky_post_data
@@ -172,42 +159,34 @@ class Category_Sticky_Post {
 	/**
 	 * Register and enqueue the stylesheets and JavaScript dependencies for styling the sticky post.
 	 */
-	function add_admin_styles_and_scripts() {
+	public function add_admin_styles_and_scripts() {
 	
 		// Only register the stylesheet for the post page
 		$screen = get_current_screen();
 		if( 'post' == $screen->id ) { 
 	
 			// admin stylesheet
-			wp_register_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/admin.css' ) );
-			wp_enqueue_style( 'category-sticky-post' );
+			wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/admin.css' ) );
 
 			// post editor javascript
-			wp_register_script( 'category-sticky-post-editor', plugins_url( '/category-sticky-post/js/editor.min.js' ), array( 'jquery' ) );
-			wp_enqueue_script( 'category-sticky-post-editor' );
+			wp_enqueue_script( 'category-sticky-post-editor', plugins_url( '/category-sticky-post/js/editor.min.js' ), array( 'jquery' ) );
 		
 		// And only register the JavaScript for the post listing page
 		} elseif( 'edit-post' == $screen->id ) {
 		
-			// posts display javascript
-			wp_register_script( 'category-sticky-post', plugins_url( '/category-sticky-post/js/admin.min.js' ), array( 'jquery' ) );
-			wp_enqueue_script( 'category-sticky-post' );
+			wp_enqueue_script( 'category-sticky-post', plugins_url( '/category-sticky-post/js/admin.min.js' ), array( 'jquery' ) );
 		
 		} // end if
 		
 	} // end add_admin_styles_and_scripts
 	
 	/**
-	 * Register and enqueue the stylesheets for styling the sticky post.
+	 * Register and enqueue the stylesheets for styling the sticky post, but only do so on an archives page.
 	 */
-	function add_styles() {
+	public function add_styles() {
 
-		// Only render the stylesheet if we're on an archive page
 		if( is_archive() ) {
-
-			wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/plugin.css' ) );
-			wp_enqueue_style( 'category-sticky-post-custom', plugins_url( '/category-sticky-post/css/custom.css' ) );
-			
+			wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/plugin.css' ) );			
 		} // end if
 		
 	} // end add_styles
@@ -216,9 +195,9 @@ class Category_Sticky_Post {
 	 * Ajax callback function used to decide if the specified post ID is marked as a category
 	 * sticky post.
 	 *
-	 * TODO: I wanted to do this all server side but couldn't find the proper actions and filters to do it.
+	 * TODO:	Eventually, I want to do this all server side.
 	 */
-	function is_category_sticky_post() {
+	public function is_category_sticky_post() {
 	
 		if( isset( $_GET['post_id'] ) ) {
 		
@@ -240,31 +219,33 @@ class Category_Sticky_Post {
 	 /**
 	  * Adds a CSS class to make it easy to style the sticky post.
 	  * 
-	  * @param	$classes	The array of classes being applied to the given post
-	  * @return				The updated array of classes for our posts
+	  * @param		array	$classes	The array of classes being applied to the given post
+	  * @return		array				The updated array of classes for our posts
 	  */
-	 function set_category_sticky_class( $classes ) {
+	 public function set_category_sticky_class( $classes ) {
+	 
+	 	// If we've not set the category sticky post...
+	 	if( false == $this->is_sticky_post && $this->is_sticky_post() ) {
+	 
+		 	// ...append the class to the first post (or the first time this event is raised)
+			$classes[] = 'category-sticky';
+			
+			// ...and indicate that we've set the sticky post
+			$this->is_sticky_post = true;
 		 
-		 // Read the current category
-		 $category = get_the_category();
-		 $category = $category[0];
-		
-		 // If we're on an archive and the current category ID matches the category of the given post, add the class name
-		 if( is_archive() && 0 == get_query_var( 'paged' ) && '' != get_query_var( 'cat' ) && $category->cat_ID == get_post_meta( get_the_ID(), 'category_sticky_post', true ) ) {
-			 $classes[] = 'category-sticky';
-		 } // end if
- 		 
-		 return $classes;
+		} // end if
+		 
+		return $classes;
 		 
 	 } // end set_category_sticky_class
 	 
 	 /**
 	  * Places the sticky post at the top of the list of posts for the category that is being displayed.
 	  *
-	  * @param	$posts	The lists of posts to be displayed for the given category
-	  * @return			The updated list of posts with the sticky post set as the first titem
+	  * @param	array	$posts	The lists of posts to be displayed for the given category
+	  * @return	array			The updated list of posts with the sticky post set as the first titem
 	  */
-	 function reorder_category_posts( $posts ) {
+	 public function reorder_category_posts( $posts ) {
 
 	 	// We only care to do this for the first page of the archives
 	 	if( is_archive() && 0 == get_query_var( 'paged' ) && '' != get_query_var( 'cat' ) ) {
@@ -329,8 +310,8 @@ class Category_Sticky_Post {
 	/**
 	 * Determines if the given category already has a sticky post.
 	 * 
-	 * @param	$category_id	The ID of the category to check
-	 * @return					Whether or not the category has a sticky post
+	 * @param	int		$category_id	The ID of the category to check
+	 * @return	boolean					Whether or not the category has a sticky post
 	 */
 	private function category_has_sticky_post( $category_id ) {
 	
@@ -344,7 +325,38 @@ class Category_Sticky_Post {
 
 	} // end category_has_sticky_post
 	
+	/**
+	 * Determines whether or not the current post is a sticky post for the current category.
+	 *
+	 * @return	boolean	Whether or not the current post is a sticky post for the current category.
+	 */
+	private function is_sticky_post() {
+		
+		global $post;
+		return get_query_var( 'cat' ) == get_post_meta( $post->ID, 'category_sticky_post', true );
+		
+	} // end is_sticky_post
+	
+	/**
+	 * Determines whether or not the current user has the ability to save meta data associated with this post.
+	 *
+	 * @param		int		$post_id	The ID of the post being save
+	 * @param		bool				Whether or not the user has the ability to save this post.
+	*/
+	private function user_can_save( $post_id, $nonce ) {
+		
+	    $is_autosave = wp_is_post_autosave( $post_id );
+	    $is_revision = wp_is_post_revision( $post_id );
+	    $is_valid_nonce = ( isset( $_POST[ $nonce ] ) && wp_verify_nonce( $_POST[ $nonce ], plugin_basename( __FILE__ ) ) );
+	    
+	    // Return true if the user is able to save; otherwise, false.
+	    return ! ( $is_autosave || $is_revision ) && $is_valid_nonce;
+	 
+	} // end user_can_save
+	
 } // end class
 
-new Category_Sticky_Post();
-?>
+function Category_Sticky_Post() {
+	Category_Sticky_Post::getInstance();
+} // end Category_StickyPost
+add_action( 'plugins_loaded', 'Category_Sticky_Post' );

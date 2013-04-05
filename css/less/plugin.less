@@ -9,7 +9,6 @@
 /* --- 1. Variables --- */
 
 @black:		#000;
-@margin:	-20px;
 @border: 	4px solid @black;
 
 /* --- 2. Mixins --- */
@@ -17,15 +16,10 @@
 .border () {
 	border-top: 	@border;
 	border-bottom:	@border;
-}
-
-.margin() {
-	margin: 0 @margin 0 @margin;
-}
+} // .border
 
 /* --- 3. Styles --- */
 
 .category-sticky {
 	.border();
-	.margin();
-}
+} // .category-sticky
