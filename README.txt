@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/category-sticky-post/
 Tags: categories, post
 Requires at least: 3.4.1
 Tested up to: 3.5.1
-Stable tag: 1.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,6 @@ Category Sticky Post...
 * Provides light styling that should look good in most themes
 * Is available on each post editor page
 * Is fully localized and ready for translation
-* Includes a custom.css file so that you can style the plugin to look however you want
 
 For more information or to follow the project, check out the [project page](http://tommcfarlin.com/category-sticky-post/).
 
@@ -51,6 +50,9 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are category sticky posts
 
 == Changelog ==
+
+= 1.2.1 =
+* Removing the custom.css line in the README file
 
 = 1.2 =
 * Now posts that belong to multiple categories are properly styled when they are marked as sticky

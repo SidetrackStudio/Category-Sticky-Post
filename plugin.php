@@ -3,7 +3,7 @@
 Plugin Name: Category Sticky Post
 Plugin URI: http://tommcfarlin.com/category-sticky-post/
 Description: Mark a post to be placed at the top of a specified category archive. It's sticky posts specifically for categories.
-Version: 1.2
+Version: 1.2.1
 Author: Tom McFarlin
 Author URI: http://tommcfarlin.com
 Author Email: tom@tommcfarlin.com
