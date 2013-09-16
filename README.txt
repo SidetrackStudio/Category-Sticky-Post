@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/category-sticky-post/
 Tags: categories, post
 Requires at least: 3.4.1
-Tested up to: 3.5.1
-Stable tag: 1.2.1
+Tested up to: 3.6.1
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,12 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are category sticky posts
 
 == Changelog ==
+
+= 2.0.0 =
+* Resolving a bug that marked the category as 'unstuck' when updating a post
+* Introduced a feature for disabling the category sticky border
+* Improving the coding standards of the plugin be separating the class into its own file
+* Improving the PHPDoc of the plugin
 
 = 1.2.1 =
 * Removing the custom.css line in the README file
