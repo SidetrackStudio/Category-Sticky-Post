@@ -4,7 +4,7 @@ Donate link: http://tommcfarlin.com/category-sticky-post/
 Tags: categories, post
 Requires at least: 3.4.1
 Tested up to: 3.6.1
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,10 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are category sticky posts
 
 == Changelog ==
+
+= 2.1.0 =
+* Updating the plugin to support pages custom post types
+* Moving the screenshots to the `/assets/` directory to make the download a bit smaller
 
 = 2.0.0 =
 * Resolving a bug that marked the category as 'unstuck' when updating a post

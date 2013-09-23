@@ -97,14 +97,22 @@ class Category_Sticky_Post {
 	 */
 	public function add_category_sticky_post_meta_box() {
 
-		add_meta_box(
-			'post_is_sticky',
-			__( 'Category Sticky', 'category-sticky-post' ),
-			array( $this, 'category_sticky_post_display' ),
-			'post',
-			'side',
-			'low'
-		);
+		// First, read all of the post types
+		$post_types = get_post_types( '', 'names' );
+
+		// Now, for each post type, add the meta box
+		foreach( $post_types as $post_type ) {
+
+			add_meta_box(
+				'post_is_sticky',
+				__( 'Category Sticky', 'category-sticky-post' ),
+				array( $this, 'category_sticky_post_display' ),
+				$post_type,
+				'side',
+				'low'
+			);
+
+		} // end foreach
 
 	} // end add_category_sticky_post_meta_box
 
@@ -170,22 +178,9 @@ class Category_Sticky_Post {
 	 */
 	public function add_admin_styles_and_scripts() {
 
-		// Only register the stylesheet for the post page
-		$screen = get_current_screen();
-		if( 'post' == $screen->id ) {
-
-			// admin stylesheet
-			wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/admin.css' ) );
-
-			// post editor javascript
-			wp_enqueue_script( 'category-sticky-post-editor', plugins_url( '/category-sticky-post/js/editor.min.js' ), array( 'jquery' ) );
-
-		// And only register the JavaScript for the post listing page
-		} elseif( 'edit-post' == $screen->id ) {
-
-			wp_enqueue_script( 'category-sticky-post', plugins_url( '/category-sticky-post/js/admin.min.js' ), array( 'jquery' ) );
-
-		} // end if
+		wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/admin.css' ) );
+		wp_enqueue_script( 'category-sticky-post-editor', plugins_url( '/category-sticky-post/js/editor.min.js' ), array( 'jquery' ) );
+		wp_enqueue_script( 'category-sticky-post', plugins_url( '/category-sticky-post/js/admin.min.js' ), array( 'jquery' ) );
 
 	} // end add_admin_styles_and_scripts
 
