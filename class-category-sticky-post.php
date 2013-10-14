@@ -237,7 +237,7 @@ class Category_Sticky_Post {
 	  public function set_category_sticky_class( $classes ) {
 
 	 	// If we've not set the category sticky post...
-	 	if( false == $this->is_sticky_post && $this->is_sticky_post() ) {
+	 	if( is_category() && false == $this->is_sticky_post && $this->is_sticky_post() ) {
 
 		 	// ...append the class to the first post (or the first time this event is raised)
 			$classes[] = 'category-sticky';
