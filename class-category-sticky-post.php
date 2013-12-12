@@ -103,6 +103,10 @@ class Category_Sticky_Post {
 		// Now, for each post type, add the meta box
 		foreach( $post_types as $post_type ) {
 
+			if ( 'page' === $post_type ) {
+				continue;
+			} // end if
+
 			add_meta_box(
 				'post_is_sticky',
 				__( 'Category Sticky', 'category-sticky-post' ),
