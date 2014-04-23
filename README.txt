@@ -3,8 +3,8 @@ Contributors: tommcfarlin
 Donate link: http://tommcfarlin.com/category-sticky-post/
 Tags: categories, post
 Requires at least: 3.4.1
-Tested up to: 3.8.0
-Stable tag: 2.3.0
+Tested up to: 3.9.0
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,9 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are category sticky posts
 
 == Changelog ==
+
+= 2.4.0 =
+* Verifying WordPress 3.9 compatibility
 
 = 2.3.0 =
 * Removing the ability to add the sticky post to Pages (this should not have been possible earlier)
