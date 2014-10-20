@@ -77,7 +77,7 @@ class Category_Sticky_Post {
 		add_action( 'wp_ajax_is_category_sticky_post', array( $this, 'is_category_sticky_post' ) );
 
 		// Filters for displaying the sticky category posts
-		add_filter( 'the_posts', array( $this, 'reorder_category_posts' ) );
+		add_filter( 'the_posts', array( $this, 'reorder_category_posts' ), 10, 2 );
 		add_filter( 'post_class', array( $this, 'set_category_sticky_class' ) );
 
 		// Stylesheets
@@ -263,10 +263,10 @@ class Category_Sticky_Post {
 	  *
 	  * @since      1.0.0
 	  */
-	 public function reorder_category_posts( $posts ) {
+	 public function reorder_category_posts( $posts, $query ) {
 
 	 	// We only care to do this for the first page of the archives
-	 	if( is_archive() && 0 == get_query_var( 'paged' ) && '' != get_query_var( 'cat' ) ) {
+	 	if( $query->is_main_query() && is_archive() && 0 == get_query_var( 'paged' ) && '' != get_query_var( 'cat' ) ) {
 
 		 	// Read the current category to find the sticky post
 		 	// and query for the ID of the post
