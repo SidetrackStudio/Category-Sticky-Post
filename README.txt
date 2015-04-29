@@ -1,10 +1,10 @@
 === Category Sticky Post ===
 Contributors: tommcfarlin
-Donate link: http://tommcfarlin.com/category-sticky-post/
+Donate link: https://tommcfarlin.com/category-sticky-post/
 Tags: categories, post
 Requires at least: 3.4.1
-Tested up to: 4.0.0
-Stable tag: 2.6.0
+Tested up to: 4.2.1
+Stable tag: 2.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,11 @@ For more information or to follow the project, check out the [project page](http
 4. The post dashboard indicating which entries are category sticky posts
 
 == Changelog ==
+
+= 2.7.0 =
+
+* WordPress 4.2.1 compatibility
+* Updating copyright dates
 
 = 2.6.0 =
 

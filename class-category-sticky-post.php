@@ -6,7 +6,7 @@
  * @author    Tom McFarlin <tom@tommcfarlin.com>
  * @license   GPL-2.0+
  * @link      http://tommcfarlin.com/category-sticky-post/
- * @copyright 2013 Tom McFarlin
+ * @copyright 2013 - 2015 Tom McFarlin
  */
 
 /**
