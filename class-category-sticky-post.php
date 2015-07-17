@@ -51,11 +51,11 @@ class Category_Sticky_Post {
 
 		if( null == self::$instance ) {
 			self::$instance = new Category_Sticky_Post();
-		} // end if
+		}
 
 		return self::$instance;
 
-	} // end getInstance
+	}
 
 	/*--------------------------------------------*
 	 * Constructor
@@ -84,7 +84,7 @@ class Category_Sticky_Post {
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_admin_styles_and_scripts' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'add_styles' ) );
 
-	} // end constructor
+	}
 
 	/*---------------------------------------------*
 	 * Action Functions
@@ -116,9 +116,9 @@ class Category_Sticky_Post {
 				'low'
 			);
 
-		} // end foreach
+		}
 
-	} // end add_category_sticky_post_meta_box
+	}
 
 	/**
 	 * Renders the select box that allows users to choose the category into which to stick the
@@ -139,7 +139,7 @@ class Category_Sticky_Post {
 
 		echo $html;
 
-	} // end category_sticky_post_display
+	}
 
 	/**
 	 * Set the custom post meta for marking a post as sticky.
@@ -156,12 +156,12 @@ class Category_Sticky_Post {
 			$category_id = get_post_meta( $post_id, 'category_sticky_post', true );
 			if( isset( $_POST['category_sticky_post'] ) ) {
 				$category_id = esc_attr( $_POST['category_sticky_post'] );
-			} // end if
+			}
 
 			// If the value exists, delete it first. I don't want to write extra rows into the table.
 			if ( 0 == count( get_post_meta( $post_id, 'category_sticky_post' ) ) ) {
 				delete_post_meta( $post_id, 'category_sticky_post' );
-			} // end if
+			}
 			update_post_meta( $post_id, 'category_sticky_post', $category_id );
 
 			// Read the ID of the category to which we're going to stick this post
@@ -169,11 +169,11 @@ class Category_Sticky_Post {
 				update_post_meta( $post_id, 'category_sticky_post_border', esc_attr( $_POST['category_sticky_post_border'] ) );
 			} else {
 				delete_post_meta( $post_id, 'category_sticky_post_border' );
-			} // end if/else
+			}
 
-		} // end if
+		}
 
-	} // end save_category_sticky_post_data
+	}
 
 	/**
 	 * Register and enqueue the stylesheets and JavaScript dependencies for styling the sticky post.
@@ -186,7 +186,7 @@ class Category_Sticky_Post {
 		wp_enqueue_script( 'category-sticky-post-editor', plugins_url( '/category-sticky-post/js/editor.min.js' ), array( 'jquery' ) );
 		wp_enqueue_script( 'category-sticky-post', plugins_url( '/category-sticky-post/js/admin.min.js' ), array( 'jquery' ) );
 
-	} // end add_admin_styles_and_scripts
+	}
 
 	/**
 	 * Register and enqueue the stylesheets for styling the sticky post, but only do so on an archives page.
@@ -199,9 +199,9 @@ class Category_Sticky_Post {
 
 		if( is_archive() && '1' !== get_post_meta( $post->ID, 'category_sticky_post_border', true ) ) {
 			wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/plugin.css' ) );
-		} // end if
+		}
 
-	} // end add_styles
+	}
 
 	/**
 	 * Ajax callback function used to decide if the specified post ID is marked as a category
@@ -216,15 +216,16 @@ class Category_Sticky_Post {
 		if( isset( $_GET['post_id'] ) ) {
 
 			$post_id = trim ( $_GET['post_id'] );
+
 			if( 0 == get_post_meta( $post_id, 'category_sticky_post', true ) ) {
 				die( '0' );
 			} else {
 				die( _e( ' - Category Sticky Post', 'category-sticky-post' ) );
-			} // end if/else
+			}
 
-		} // end if
+		}
 
-	} // end is_category_sticky_post
+	}
 
 	/*---------------------------------------------*
 	 * Filter Functions
@@ -249,11 +250,11 @@ class Category_Sticky_Post {
 			// ...and indicate that we've set the sticky post
 			$this->is_sticky_post = true;
 
-		} // end if
+		}
 
 		return $classes;
 
-	 } // end set_category_sticky_class
+	 }
 
 	 /**
 	  * Places the sticky post at the top of the list of posts for the category that is being displayed.
@@ -289,44 +290,24 @@ class Category_Sticky_Post {
 			 		// If so, then remove it so we don't duplicate its display
 			 		if( $post_id == $posts[ $post_index ]->ID ) {
 				 		unset( $posts[ $post_index ] );
-			 		} // end if
+			 		}
 
-			 	} // end foreach
+			 	}
 
 			 	// Merge the existing array (with the sticky post first and the original posts second)
 			 	$posts = array_merge( $new_posts, $posts );
 
-		 	} // end if
+		 	}
 
-	 	} // end if
+	 	}
 
 	 	return $posts;
 
-	 } // end reorder_category_posts
+	 }
 
 	/*---------------------------------------------*
 	 * Helper Functions
 	 *---------------------------------------------*/
-
-	/**
-	 * Determines if the given category already has a sticky post.
-	 *
-	 * @param	   int		 $category_id	The ID of the category to check
-	 * @return	   boolean					Whether or not the category has a sticky post
-	 *
-	 * @since      1.0.0
-	 */
-	private function category_has_sticky_post( $category_id ) {
-
-		$has_sticky_post = false;
-
-		$query = new WP_Query( 'meta_key=category_sticky_post&meta_value=' . $category_id );
-		$has_sticky_post = $query->have_posts();
-		wp_reset_query();
-
-		return $has_sticky_post;
-
-	} // end category_has_sticky_post
 
 	/**
 	 * Determines whether or not the current post is a sticky post for the current category.
@@ -340,7 +321,7 @@ class Category_Sticky_Post {
 		global $post;
 		return get_query_var( 'cat' ) == get_post_meta( $post->ID, 'category_sticky_post', true );
 
-	} // end is_sticky_post
+	}
 
 	/**
 	 * Determines whether or not the current user has the ability to save meta data associated with this post.
@@ -359,7 +340,7 @@ class Category_Sticky_Post {
 	    // Return true if the user is able to save; otherwise, false.
 	    return ! ( $is_autosave || $is_revision ) && $is_valid_nonce;
 
-	} // end user_can_save
+	}
 
 	/**
 	 * Creates the label and the checkbox used to give the user the option to hide or to display
@@ -390,7 +371,7 @@ class Category_Sticky_Post {
 		 		)
 		 	);
 
-	} // end get_sticky_query
+	}
 
 	/**
 	 * Creates the label and the select box used to give the user the option to select
@@ -410,15 +391,15 @@ class Category_Sticky_Post {
 		$html = '<select id="category_sticky_post" name="category_sticky_post">';
 			$html .= '<option value="0">' . __( 'Select a category...', 'category-sticky-post' ) . '</option>';
 			foreach( $categories as $category ) {
-				$html .= '<option value="' . $category->cat_ID . '" ' . selected( get_post_meta( $post->ID, 'category_sticky_post', true ), $category->cat_ID, false ) . ( $this->category_has_sticky_post( $category->cat_ID ) ? ' disabled ' : '' ) . '>';
+				$html .= '<option value="' . $category->cat_ID . '" ' . selected( get_post_meta( $post->ID, 'category_sticky_post', true ), $category->cat_ID, false ) . '>';
 					$html .= $category->cat_name;
 				$html .= '</option>';
-			} // end foreach
+			}
 		$html .= '</select>';
 
 		return $html;
 
-	} // end display_categories
+	}
 
 	/**
 	 * Creates the label and the checkbox used to give the user the option to hide or to display
@@ -439,6 +420,6 @@ class Category_Sticky_Post {
 
 		return $html;
 
-	} // end get_border_checkbox
+	}
 
-} // end class
+}
