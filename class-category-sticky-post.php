@@ -353,6 +353,7 @@ class Category_Sticky_Post {
 	 *
 	 * @since    2.0.0
 	 */
+	// https://wordpress.org/support/topic/does-not-work-anymore-21/
 	private function get_sticky_query( $category ) {
 		return new WP_Query(
 			array(
