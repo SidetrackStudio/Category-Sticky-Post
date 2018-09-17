@@ -16,7 +16,8 @@
 
 class Category_Sticky_Post {
 
-	/*--------------------------------------------*
+	/*
+	--------------------------------------------*
 	 * Attributes
 	 *--------------------------------------------*/
 
@@ -27,7 +28,7 @@ class Category_Sticky_Post {
 	 *
 	 * @var     Category_Sticky_Post
 	 */
-	 private static $instance = null;
+	private static $instance = null;
 
 	/**
 	 * A boolean used to track whether or not the sticky post has been marked as sticky.
@@ -36,9 +37,10 @@ class Category_Sticky_Post {
 	 *
 	 * @var     boolean
 	 */
-	 private $is_sticky_post;
+	private $is_sticky_post;
 
-	/*--------------------------------------------*
+	/*
+	--------------------------------------------*
 	 * Singleton Implementation
 	 *--------------------------------------------*/
 
@@ -49,7 +51,7 @@ class Category_Sticky_Post {
 	 */
 	public static function get_instance() {
 
-		if( null == self::$instance ) {
+		if ( null == self::$instance ) {
 			self::$instance = new Category_Sticky_Post();
 		}
 
@@ -57,7 +59,8 @@ class Category_Sticky_Post {
 
 	}
 
-	/*--------------------------------------------*
+	/*
+	--------------------------------------------*
 	 * Constructor
 	 *--------------------------------------------*/
 
@@ -86,7 +89,8 @@ class Category_Sticky_Post {
 
 	}
 
-	/*---------------------------------------------*
+	/*
+	---------------------------------------------*
 	 * Action Functions
 	 *---------------------------------------------*/
 
@@ -101,7 +105,7 @@ class Category_Sticky_Post {
 		$post_types = get_post_types( '', 'names' );
 
 		// Now, for each post type, add the meta box
-		foreach( $post_types as $post_type ) {
+		foreach ( $post_types as $post_type ) {
 
 			if ( 'page' === $post_type ) {
 				continue;
@@ -124,7 +128,7 @@ class Category_Sticky_Post {
 	 * Renders the select box that allows users to choose the category into which to stick the
 	 * specified post.
 	 *
-	 * @param	object	$post	The post to be marked as sticky for the specified category.
+	 * @param   object $post   The post to be marked as sticky for the specified category.
 	 *
 	 * @since    1.0.0
 	 */
@@ -134,7 +138,7 @@ class Category_Sticky_Post {
 		wp_nonce_field( plugin_basename( __FILE__ ), 'category_sticky_post_nonce' );
 
 		// Get the category dropdown and the checkbox for displaying the border
-		$html =  $this->get_categories_list( $post );
+		$html = $this->get_categories_list( $post );
 		$html .= $this->get_border_checkbox( $post );
 
 		echo $html;
@@ -144,17 +148,17 @@ class Category_Sticky_Post {
 	/**
 	 * Set the custom post meta for marking a post as sticky.
 	 *
-	 * @param	int    $post_id	    The ID of the post to which we're saving the post meta
+	 * @param   int $post_id     The ID of the post to which we're saving the post meta
 	 *
 	 * @since    1.0.0
 	 */
 	public function save_category_sticky_post_data( $post_id ) {
 
-		if( isset( $_POST['category_sticky_post_nonce'] ) && isset( $_POST['post_type'] ) && $this->user_can_save( $post_id, 'category_sticky_post_nonce' ) ) {
+		if ( isset( $_POST['category_sticky_post_nonce'] ) && isset( $_POST['post_type'] ) && $this->user_can_save( $post_id, 'category_sticky_post_nonce' ) ) {
 
 			// Read the ID of the category to which we're going to stick this post
 			$category_id = get_post_meta( $post_id, 'category_sticky_post', true );
-			if( isset( $_POST['category_sticky_post'] ) ) {
+			if ( isset( $_POST['category_sticky_post'] ) ) {
 				$category_id = esc_attr( $_POST['category_sticky_post'] );
 			}
 
@@ -165,12 +169,11 @@ class Category_Sticky_Post {
 			update_post_meta( $post_id, 'category_sticky_post', $category_id );
 
 			// Read the ID of the category to which we're going to stick this post
-			if( isset( $_POST['category_sticky_post_border'] ) ) {
+			if ( isset( $_POST['category_sticky_post_border'] ) ) {
 				update_post_meta( $post_id, 'category_sticky_post_border', esc_attr( $_POST['category_sticky_post_border'] ) );
 			} else {
 				delete_post_meta( $post_id, 'category_sticky_post_border' );
 			}
-
 		}
 
 	}
@@ -197,7 +200,7 @@ class Category_Sticky_Post {
 
 		global $post;
 
-		if( is_archive() && '1' !== get_post_meta( $post->ID, 'category_sticky_post_border', true ) ) {
+		if ( is_archive() && '1' !== get_post_meta( $post->ID, 'category_sticky_post_border', true ) ) {
 			wp_enqueue_style( 'category-sticky-post', plugins_url( '/category-sticky-post/css/plugin.css' ) );
 		}
 
@@ -207,44 +210,44 @@ class Category_Sticky_Post {
 	 * Ajax callback function used to decide if the specified post ID is marked as a category
 	 * sticky post.
 	 *
-	 * TODO:	Eventually, I want to do this all server side.
+	 * TODO:    Eventually, I want to do this all server side.
 	 *
 	 * @since    1.0.0
 	 */
 	public function is_category_sticky_post() {
 
-		if( isset( $_GET['post_id'] ) ) {
+		if ( isset( $_GET['post_id'] ) ) {
 
-			$post_id = trim ( $_GET['post_id'] );
+			$post_id = trim( $_GET['post_id'] );
 
-			if( 0 == get_post_meta( $post_id, 'category_sticky_post', true ) ) {
+			if ( 0 == get_post_meta( $post_id, 'category_sticky_post', true ) ) {
 				die( '0' );
 			} else {
 				die( _e( ' - Category Sticky Post', 'category-sticky-post' ) );
 			}
-
 		}
 
 	}
 
-	/*---------------------------------------------*
+	/*
+	---------------------------------------------*
 	 * Filter Functions
 	 *---------------------------------------------*/
 
 	 /**
 	  * Adds a CSS class to make it easy to style the sticky post.
 	  *
-	  * @param		array	$classes	The array of classes being applied to the given post
-	  * @return		array				The updated array of classes for our posts
+	  * @param      array $classes    The array of classes being applied to the given post
+	  * @return     array               The updated array of classes for our posts
 	  *
 	  * @since      1.0.0
 	  */
-	  public function set_category_sticky_class( $classes ) {
+	public function set_category_sticky_class( $classes ) {
 
-	 	// If we've not set the category sticky post...
-	 	if( is_category() && false == $this->is_sticky_post && $this->is_sticky_post() ) {
+		// If we've not set the category sticky post...
+		if ( is_category() && false == $this->is_sticky_post && $this->is_sticky_post() ) {
 
-		 	// ...append the class to the first post (or the first time this event is raised)
+			// ...append the class to the first post (or the first time this event is raised)
 			$classes[] = 'category-sticky';
 
 			// ...and indicate that we've set the sticky post
@@ -254,65 +257,64 @@ class Category_Sticky_Post {
 
 		return $classes;
 
-	 }
+	}
 
 	 /**
 	  * Places the sticky post at the top of the list of posts for the category that is being displayed.
 	  *
-	  * @param	    array	$posts	The lists of posts to be displayed for the given category
-	  * @return	    array			The updated list of posts with the sticky post set as the first titem
+	  * @param      array $posts  The lists of posts to be displayed for the given category
+	  * @return     array           The updated list of posts with the sticky post set as the first titem
 	  *
 	  * @since      1.0.0
 	  */
-	 public function reorder_category_posts( $posts, $query ) {
+	public function reorder_category_posts( $posts, $query ) {
 
-	 	// We only care to do this for the first page of the archives
-	 	if( $query->is_main_query() && is_archive() && 0 == get_query_var( 'paged' ) && '' != get_query_var( 'cat' ) ) {
+		// We only care to do this for the first page of the archives
+		if ( $query->is_main_query() && is_archive() && 0 == get_query_var( 'paged' ) && '' != get_query_var( 'cat' ) ) {
 
-		 	// Read the current category to find the sticky post
-		 	// and query for the ID of the post
-		 	$category = get_category( get_query_var( 'cat' ) );
-		 	$sticky_query = $this->get_sticky_query( $category );
+			// Read the current category to find the sticky post
+			// and query for the ID of the post
+			$category = get_category( get_query_var( 'cat' ) );
+			$sticky_query = $this->get_sticky_query( $category );
 
-		 	// If there's a post, then set the post ID
-		 	$post_id = ( ! isset ( $sticky_query->posts[0] ) ) ? -1 : $sticky_query->posts[0];
-		 	wp_reset_postdata();
+			// If there's a post, then set the post ID
+			$post_id = ( ! isset( $sticky_query->posts[0] ) ) ? -1 : $sticky_query->posts[0];
+			wp_reset_postdata();
 
-		 	// If the query returns an actual post ID, then let's update the posts
-		 	if( -1 < $post_id ) {
+			// If the query returns an actual post ID, then let's update the posts
+			if ( -1 < $post_id ) {
 
-		 		// Store the sticky post in an array
-			 	$new_posts = array( get_post( $post_id ) );
+				// Store the sticky post in an array
+				$new_posts = array( get_post( $post_id ) );
 
-			 	// Look to see if the post exists in the current list of posts.
-			 	foreach( $posts as $post_index => $post ) {
+				// Look to see if the post exists in the current list of posts.
+				foreach ( $posts as $post_index => $post ) {
 
-			 		// If so, then remove it so we don't duplicate its display
-			 		if( $post_id == $posts[ $post_index ]->ID ) {
-				 		unset( $posts[ $post_index ] );
-			 		}
+					// If so, then remove it so we don't duplicate its display
+					if ( $post_id == $posts[ $post_index ]->ID ) {
+						unset( $posts[ $post_index ] );
+					}
+				}
 
-			 	}
+				// Merge the existing array (with the sticky post first and the original posts second)
+				$posts = array_merge( $new_posts, $posts );
 
-			 	// Merge the existing array (with the sticky post first and the original posts second)
-			 	$posts = array_merge( $new_posts, $posts );
+			}
+		}
 
-		 	}
+		return $posts;
 
-	 	}
+	}
 
-	 	return $posts;
-
-	 }
-
-	/*---------------------------------------------*
+	/*
+	---------------------------------------------*
 	 * Helper Functions
 	 *---------------------------------------------*/
 
 	/**
 	 * Determines whether or not the current post is a sticky post for the current category.
 	 *
-	 * @return	   boolean    Whether or not the current post is a sticky post for the current category.
+	 * @return     boolean    Whether or not the current post is a sticky post for the current category.
 	 *
 	 * @since      1.0.0
 	 */
@@ -326,19 +328,19 @@ class Category_Sticky_Post {
 	/**
 	 * Determines whether or not the current user has the ability to save meta data associated with this post.
 	 *
-	 * @param		int		$post_id	The ID of the post being save
-	 * @param		bool				Whether or not the user has the ability to save this post.
+	 * @param       int                                                                           $post_id    The ID of the post being save
+	 * @param       bool                Whether or not the user has the ability to save this post.
 	 *
 	 * @since      1.0.0
 	 */
 	private function user_can_save( $post_id, $nonce ) {
 
-	    $is_autosave = wp_is_post_autosave( $post_id );
-	    $is_revision = wp_is_post_revision( $post_id );
-	    $is_valid_nonce = ( isset( $_POST[ $nonce ] ) && wp_verify_nonce( $_POST[ $nonce ], plugin_basename( __FILE__ ) ) );
+		$is_autosave = wp_is_post_autosave( $post_id );
+		$is_revision = wp_is_post_revision( $post_id );
+		$is_valid_nonce = ( isset( $_POST[ $nonce ] ) && wp_verify_nonce( $_POST[ $nonce ], plugin_basename( __FILE__ ) ) );
 
-	    // Return true if the user is able to save; otherwise, false.
-	    return ! ( $is_autosave || $is_revision ) && $is_valid_nonce;
+		// Return true if the user is able to save; otherwise, false.
+		return ! ( $is_autosave || $is_revision ) && $is_valid_nonce;
 
 	}
 
@@ -346,30 +348,52 @@ class Category_Sticky_Post {
 	 * Creates the label and the checkbox used to give the user the option to hide or to display
 	 * the sticky post border.
 	 *
-	 * @param    object    $category    The category for which we're looking to find the sticky post.
+	 * @param    object $category    The category for which we're looking to find the sticky post.
 	 * @return   WP_Query               The query used to return the category with the sticky post.
 	 *
 	 * @since    2.0.0
 	 */
 	private function get_sticky_query( $category ) {
-
 		return new WP_Query(
-		 		array(
-			 		'fields'			=>	'ids',
-			 		'post_type'			=>	'post',
-			 		'posts_per_page'	=>	'1',
-			 		'tax_query'			=> array(
-			 			'terms'				=> 	null,
-			 			'include_children'	=>	false
-			 		),
-			 		'meta_query'		=>	array(
-			 			array(
-				 			'key'		=>	'category_sticky_post',
-				 			'value'		=>	$category->cat_ID,
-				 		)
-			 		)
-		 		)
-		 	);
+			array(
+				'fields' => 'ids',
+				'post_type' => 'post',
+				'posts_per_page' => '1',
+				'tax_query' => array(
+					array(
+						'taxonomy' => 'category',
+						'field' => 'term_id',
+						'terms' => array( $category->cat_ID ),
+					),
+				),
+				'meta_query' => array(
+					array(
+						'key' => 'category_sticky_post',
+						'value' => $category->cat_ID,
+					),
+				),
+			)
+		);
+	}
+
+	private function get_sticky_query1( $category ) {
+		return new WP_Query(
+			array(
+				'fields'            => 'ids',
+				'post_type'         => 'post',
+				'posts_per_page'    => '1',
+				'tax_query'         => array(
+					'terms'             => null,
+					'include_children'  => false,
+				),
+				'meta_query'        => array(
+					array(
+						'key'       => 'category_sticky_post',
+						'value'     => $category->cat_ID,
+					),
+				),
+			)
+		);
 
 	}
 
@@ -377,7 +401,7 @@ class Category_Sticky_Post {
 	 * Creates the label and the select box used to give the user the option to select
 	 * their category.
 	 *
-	 * @param    object    $post    The current post.
+	 * @param    object $post    The current post.
 	 * @return   string    $html    The HTML used to render the markup
 	 *
 	 * @since    2.0.0
@@ -390,11 +414,11 @@ class Category_Sticky_Post {
 		// Build the HTML that will display the select box
 		$html = '<select id="category_sticky_post" name="category_sticky_post">';
 			$html .= '<option value="0">' . __( 'Select a category...', 'category-sticky-post' ) . '</option>';
-			foreach( $categories as $category ) {
-				$html .= '<option value="' . $category->cat_ID . '" ' . selected( get_post_meta( $post->ID, 'category_sticky_post', true ), $category->cat_ID, false ) . '>';
-					$html .= $category->cat_name;
-				$html .= '</option>';
-			}
+		foreach ( $categories as $category ) {
+			$html .= '<option value="' . $category->cat_ID . '" ' . selected( get_post_meta( $post->ID, 'category_sticky_post', true ), $category->cat_ID, false ) . '>';
+				$html .= $category->cat_name;
+			$html .= '</option>';
+		}
 		$html .= '</select>';
 
 		return $html;
@@ -405,7 +429,7 @@ class Category_Sticky_Post {
 	 * Creates the label and the checkbox used to give the user the option to hide or to display
 	 * the sticky post border.
 	 *
-	 * @param    object    $post    The current post.
+	 * @param    object $post    The current post.
 	 * @return   string    $html    The HTML used to render the markup
 	 *
 	 * @since    2.0.0
